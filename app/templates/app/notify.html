@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification project</title>
+</head>
+<body>
+
+    <h1>🔔 Notifications</h1>
+    <input type="text" id="msg" placeholder="Enter notification"/>
+    <button onclick="sendNotification()">Send</button>
+
+    <ul id="notifications"></ul>
+
+    <script>
+        const socket = new WebSocket(
+            'ws://' + window.location.host + '/ws/notifications/'
+        )
+
+        socket.onmessage = function(e){
+            const data = JSON.parse(e.data)
+            let list = document.getElementById("notifications")
+            list.innerHTML += `<li>${data.message}</li>`
+        }
+        
+        function sendNotification(){
+            let input = document.getElementById('msg')
+            let message = input.value
+
+            if(message.trim() === "") return  // optional safety
+
+            socket.send(JSON.stringify({
+                'message': message
+            }))
+
+            input.value = ""  
+        }
+    </script>
+
+</body>
+</html>
